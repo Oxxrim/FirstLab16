@@ -1,5 +1,6 @@
 package ua.kpi.firstlab16;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -7,8 +8,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.sql.SQLException;
+
+import ua.kpi.firstlab16.domain.Way;
+import ua.kpi.firstlab16.util.DatabaseHelper;
 
 public class MainActivity extends AppCompatActivity {
+
+    private DatabaseHelper helper = new DatabaseHelper(this);
 
     private EditText from;
     private EditText to;
@@ -16,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private RadioButton twelve;
     private RadioButton fifteen;
     private Button ok;
+    private Button open;
     private TextView result;
 
     private String trainFrom;
@@ -34,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         twelve = findViewById(R.id.radio_twelve);
         fifteen = findViewById(R.id.radio_fifteen);
         ok = findViewById(R.id.ok);
+        open = findViewById(R.id.open);
         result = findViewById(R.id.result);
 
         eight.setOnClickListener(radioButtonClickListener);
@@ -48,6 +59,20 @@ public class MainActivity extends AppCompatActivity {
                 trainFrom = from.getText().toString();
                 trainTo = to.getText().toString();
                 result.setText(trainFrom  + " -> " + trainTo + " at " + time);
+                Way way = new Way(result.getText().toString());
+                try {
+                    helper.addWay(way);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(getApplicationContext(), "Way has been added to db", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        open.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext(), ListOfWaysActivity.class));
             }
         });
     }
